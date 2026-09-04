@@ -1122,7 +1122,7 @@ function M.status(buf)
   local config = assert(vim.diagnostic.config()).status or {} --- @type vim.diagnostic.Opts.Status
   vim.validate('config.format', config.format, 'function', true)
 
-  local counts = M.count(buf)
+  local counts = M.count(buf, { enabled = true })
   local format = config.format
   local result_str --- @type string
   if type(format) == 'function' then

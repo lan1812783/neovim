@@ -4367,6 +4367,41 @@ describe('vim.diagnostic', function()
 
       eq('%#ERROR#EE 1 %#WARN#WW 1 %#INFO#II 0 %#HINT#HH 0%##', result)
     end)
+
+    it('returns count for enabled diagnostics', function()
+      local result = exec_lua(function()
+        vim.diagnostic.set(_G.diagnostic_ns, 0, {
+          _G.make_error('Error 1', 0, 1, 0, 1),
+
+          _G.make_warning('Warning 1', 2, 2, 2, 2),
+          _G.make_warning('Warning 2', 2, 2, 2, 2),
+
+          _G.make_info('Info 1', 3, 3, 3, 3),
+          _G.make_info('Info 2', 3, 3, 3, 3),
+          _G.make_info('Info 3', 3, 3, 3, 3),
+
+          _G.make_hint('Hint 1', 4, 4, 4, 4),
+          _G.make_hint('Hint 2', 4, 4, 4, 4),
+          _G.make_hint('Hint 3', 4, 4, 4, 4),
+          _G.make_hint('Hint 4', 4, 4, 4, 4),
+        })
+
+        vim.diagnostic.set(_G.other_ns, 0, {
+          _G.make_error('Error 1', 0, 1, 0, 1),
+          _G.make_error('Error 2', 1, 1, 1, 1),
+
+          _G.make_warning('Warning 1', 2, 2, 2, 2),
+        })
+        vim.diagnostic.enable(false, { ns_id = _G.other_ns })
+
+        return vim.diagnostic.status()
+      end)
+
+      eq(
+        '%#DiagnosticSignError#E:1 %#DiagnosticSignWarn#W:2 %#DiagnosticSignInfo#I:3 %#DiagnosticSignHint#H:4%##',
+        result
+      )
+    end)
   end)
 
   describe('handlers', function()
